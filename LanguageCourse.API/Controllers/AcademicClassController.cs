@@ -13,7 +13,7 @@ namespace LanguageCourse.API.Controllers
         {
             _academicClassService = academicClassService;
         }
-        [HttpPost("CreateStudent")]
+        [HttpPost("CreateClass")]
         public IActionResult Create([FromBody] AcademicClassDtoRequest academicClass)
         {
             try

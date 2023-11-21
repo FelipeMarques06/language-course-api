@@ -19,7 +19,7 @@ namespace LanguageCourse.Infrastructure.Repositories
         }
         public void Create(Student student)
         {
-            _dbContext.Students.Add(student);
+            _dbContext.Student.Add(student);
             _dbContext.SaveChanges();
         }
 
@@ -30,13 +30,13 @@ namespace LanguageCourse.Infrastructure.Repositories
             {
                 throw new Exception($"Student with ID {id} not found.");
             }
-            _dbContext.Students.Remove(selectedStudent);
+            _dbContext.Student.Remove(selectedStudent);
             _dbContext.SaveChanges();
         }
 
         public List<Student> GetAll()
         {
-            return _dbContext.Students.OrderBy(student => student.Id).ToList();
+            return _dbContext.Student.OrderBy(student => student.Id).ToList();
         }
 
         public Student GetById(int id)

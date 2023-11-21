@@ -19,13 +19,15 @@ builder.Services.AddSwaggerGen();
 if (builder.Environment.IsDevelopment())
 {
     builder.Services.AddDbContext<AppDbContext>(options =>
-        options.UseInMemoryDatabase("InMemoryLanguageCourse"));
+        options.UseSqlite("Data Source=../LanguageCourse.Infrastructure/languagecourse.db"));
 }
 builder.Services.AddScoped<StudentService>();
 builder.Services.AddScoped<AcademicClassService>();
+builder.Services.AddScoped<EnrollmentService>();
 
 builder.Services.AddScoped<IRepository<Student>, StudentRepository>();
 builder.Services.AddScoped<IRepository<AcademicClass>, AcademicClassRepository>();
+builder.Services.AddScoped<IRepository<Enrollment>, EnrollmentRepository>();
 
 var app = builder.Build();
 

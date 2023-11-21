@@ -13,14 +13,24 @@ namespace LanguageCourse.Infrastructure.Repositories
     public class AcademicClassRepository : IRepository<AcademicClass>
     {
         private readonly AppDbContext _dbContext;
+
         public AcademicClassRepository(AppDbContext dbContext)
         {
             _dbContext = dbContext;
         }
         public void Create(AcademicClass academicClass)
         {
-            _dbContext.AcademicClasses.Add(academicClass);
-            _dbContext.SaveChanges();
+            try
+            {
+                _dbContext.AcademicClass.Add(academicClass);
+                _dbContext.SaveChanges();
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine($"Error: {ex.Message}");
+                throw;
+            }
+            
         }
 
         public void Delete(int id)
@@ -30,13 +40,13 @@ namespace LanguageCourse.Infrastructure.Repositories
             {
                 throw new Exception($"Class with ID {id} not found.");
             }
-            _dbContext.AcademicClasses.Remove(selectedClass);
+            _dbContext.AcademicClass.Remove(selectedClass);
             _dbContext.SaveChanges();
         }
 
         public List<AcademicClass> GetAll()
         {
-            return _dbContext.AcademicClasses.OrderBy(x => x.Id).ToList();
+            return _dbContext.AcademicClass.OrderBy(x => x.Id).ToList();
         }
 
         public AcademicClass GetById(int id)

@@ -13,6 +13,7 @@ namespace LanguageCourse.Domain.Entities
         public string Name { get; set; }
         public string Cpf { get; set; }
         public string Email { get; set; }
-        public DateTime CreatedAt { get; set; }
+        public DateTime CreatedAt { get; set; } = DateTime.Now;
+        public List<Enrollment> Enrollments { get; set; }
     }
 }

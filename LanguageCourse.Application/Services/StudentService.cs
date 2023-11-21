@@ -12,11 +12,13 @@ namespace LanguageCourse.Application.Services
 {
     public class StudentService : IEntityService<StudentDtoRequest, Student>
     {
-        private readonly IRepository<Student> _repository;
+        private readonly IRepository<Student> _studentRepository;
+        private readonly IRepository<AcademicClass> _academicClassRepository;
 
-        public StudentService(IRepository<Student> repository)
+        public StudentService(IRepository<Student> studentRepository, IRepository<AcademicClass> academicClassRepository)
         {
-            _repository = repository;
+            _studentRepository = studentRepository;
+            _academicClassRepository = academicClassRepository;
         }
 
         public void Create(StudentDtoRequest dto)
@@ -26,18 +28,41 @@ namespace LanguageCourse.Application.Services
                 Name = dto.Name,
                 Cpf = dto.Cpf,
                 Email = dto.Email,
+                Enrollments = new List<Enrollment>()
             };
-            _repository.Create(student);
+            if (dto.AcademicClassIds == null || !dto.AcademicClassIds.Any())
+            {
+                throw new ArgumentException("At least one class must be specified to create the student.");
+            }
+
+            //Checking if Academic Class exists
+            foreach (var classId in dto.AcademicClassIds)
+            {
+                _academicClassRepository.GetById(classId);
+            }
+
+            //Attaching Student and Class to Enrollment
+            foreach (var classId in dto.AcademicClassIds)
+            {
+                var enrollment = new Enrollment
+                {
+                    AcademicClassId = classId
+                };
+                student.Enrollments.Add(enrollment);
+            }
+
+            _studentRepository.Create(student);
         }
 
         public void Delete(int id)
         {
-            _repository.Delete(id);
+            var student = _studentRepository.GetById(id);
+            _studentRepository.Delete(id);
         }
 
         public List<StudentDto> GetAll()
         {
-            var students = _repository.GetAll();
+            var students = _studentRepository.GetAll();
             var studentDtos = students.Select(student => new StudentDto
             {
                 Id = student.Id,
@@ -52,7 +77,7 @@ namespace LanguageCourse.Application.Services
 
         public StudentDto GetById(int id)
         {
-            var student = _repository.GetById(id);
+            var student = _studentRepository.GetById(id);
           
             var retrievedStudent = new StudentDto
             {
@@ -98,7 +123,7 @@ namespace LanguageCourse.Application.Services
                 updatedStudent.Email = selectedStudent.Email;
             }
 
-            _repository.Update(id, updatedStudent);
+            _studentRepository.Update(id, updatedStudent);
         }
     }
 }
