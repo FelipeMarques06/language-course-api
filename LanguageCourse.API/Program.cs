@@ -22,8 +22,10 @@ if (builder.Environment.IsDevelopment())
         options.UseInMemoryDatabase("InMemoryLanguageCourse"));
 }
 builder.Services.AddScoped<StudentService>();
+builder.Services.AddScoped<AcademicClassService>();
 
 builder.Services.AddScoped<IRepository<Student>, StudentRepository>();
+builder.Services.AddScoped<IRepository<AcademicClass>, AcademicClassRepository>();
 
 var app = builder.Build();
 
