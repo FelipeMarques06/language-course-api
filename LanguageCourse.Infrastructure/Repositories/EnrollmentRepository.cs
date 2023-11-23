@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace LanguageCourse.Infrastructure.Repositories
 {
-    public class EnrollmentRepository : IRepository<Enrollment>
+    public class EnrollmentRepository : IEnrollmentRepository
     {
         private readonly AppDbContext _dbContext;
         public EnrollmentRepository(AppDbContext dbContext)
@@ -60,6 +60,11 @@ namespace LanguageCourse.Infrastructure.Repositories
             _dbContext.Entry(selectedEnrollment).State = EntityState.Detached;
             _dbContext.Entry(entity).State = EntityState.Modified;
             _dbContext.SaveChanges();
+        }
+        public bool IsStudentEnrolled(int studentId, int academicClassId)
+        {
+            return _dbContext.Enrollment
+                .Any(e => e.StudentId == studentId && e.AcademicClassId == academicClassId);
         }
     }
 }

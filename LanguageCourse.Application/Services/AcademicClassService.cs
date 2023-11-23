@@ -12,8 +12,8 @@ namespace LanguageCourse.Application.Services
 {
     public class AcademicClassService : IEntityService<AcademicClassDtoRequest, AcademicClass>
     {
-        private readonly IRepository<AcademicClass> _repository;
-        public AcademicClassService(IRepository<AcademicClass> repository)
+        private readonly IAcademicClassRepository _repository;
+        public AcademicClassService(IAcademicClassRepository repository)
         {
             _repository = repository;
         }
@@ -85,6 +85,28 @@ namespace LanguageCourse.Application.Services
             }
 
             _repository.Update(id, updatedClass);
+        }
+
+        public void ValidateAcademicClass(List<int> AcademicClassIds)
+        {
+            HashSet<int> seenClassIds = new HashSet<int>();
+            foreach (var classId in AcademicClassIds)
+            {
+                var academicClass = _repository.GetById(classId);
+
+                if (academicClass == null)
+                {
+                    throw new ArgumentException($"Class {classId} does not exist.");
+                }
+                if (!seenClassIds.Add(classId))
+                {
+                    throw new ArgumentException($"You tried enrolling a student in class {classId} twice or more.");
+                }
+                if (_repository.IsClassFull(classId))
+                {
+                    throw new ArgumentException($"Class {classId} already has 5 students.");
+                }
+            }
         }
     }
 }

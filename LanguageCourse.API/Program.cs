@@ -27,7 +27,9 @@ builder.Services.AddScoped<EnrollmentService>();
 
 builder.Services.AddScoped<IRepository<Student>, StudentRepository>();
 builder.Services.AddScoped<IRepository<AcademicClass>, AcademicClassRepository>();
+builder.Services.AddScoped<IAcademicClassRepository, AcademicClassRepository>();
 builder.Services.AddScoped<IRepository<Enrollment>, EnrollmentRepository>();
+builder.Services.AddScoped<IEnrollmentRepository, EnrollmentRepository>();
 
 var app = builder.Build();
 

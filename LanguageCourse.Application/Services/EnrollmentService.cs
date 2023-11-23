@@ -12,8 +12,8 @@ namespace LanguageCourse.Application.Services
 {
     public class EnrollmentService : IEntityService<EnrollmentDtoRequest, Enrollment>
     {
-        private readonly IRepository<Enrollment> _repository;
-        public EnrollmentService(IRepository<Enrollment> repository)
+        private readonly IEnrollmentRepository _repository;
+        public EnrollmentService(IEnrollmentRepository repository)
         {
             _repository = repository;
         }
@@ -24,6 +24,7 @@ namespace LanguageCourse.Application.Services
                 StudentId = dto.StudentId,
                 AcademicClassId = dto.AcademicClassId,
             };
+            IsStudentEnrolled(enrollment.StudentId, enrollment.AcademicClassId);
             _repository.Create(enrollment);
         }
 
@@ -62,6 +63,14 @@ namespace LanguageCourse.Application.Services
         public void Update(int id, EnrollmentDtoRequest enrollment)
         {
             throw new NotImplementedException();
+        }
+
+        public void IsStudentEnrolled(int studentId, int academicClassId)
+        {
+            if (_repository.IsStudentEnrolled(studentId, academicClassId))
+            {
+                throw new Exception($"Student with ID {studentId} is already enrolled in Class {academicClassId}");
+            }       
         }
     }
 }

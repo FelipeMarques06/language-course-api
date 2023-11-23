@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace LanguageCourse.Infrastructure.Repositories
 {
-    public class AcademicClassRepository : IRepository<AcademicClass>
+    public class AcademicClassRepository : IAcademicClassRepository
     {
         private readonly AppDbContext _dbContext;
 
@@ -20,17 +20,8 @@ namespace LanguageCourse.Infrastructure.Repositories
         }
         public void Create(AcademicClass academicClass)
         {
-            try
-            {
                 _dbContext.AcademicClass.Add(academicClass);
                 _dbContext.SaveChanges();
-            }
-            catch(Exception ex)
-            {
-                Console.WriteLine($"Error: {ex.Message}");
-                throw;
-            }
-            
         }
 
         public void Delete(int id)
@@ -70,6 +61,18 @@ namespace LanguageCourse.Infrastructure.Repositories
             _dbContext.Entry(selectedClass).State = EntityState.Detached;
             _dbContext.Entry(entity).State = EntityState.Modified;
             _dbContext.SaveChanges();
+        }
+        public bool IsClassFull(int id)
+        {
+            var selectedClass = _dbContext.AcademicClass
+             .Include(ac => ac.Enrollments)
+             .FirstOrDefault(x => x.Id == id);
+
+            if (selectedClass == null)
+            {
+                throw new Exception($"Class with ID {id} not found.");
+            }
+            return selectedClass.Enrollments.Count >= 5;
         }
     }
 }

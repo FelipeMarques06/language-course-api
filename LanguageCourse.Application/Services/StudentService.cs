@@ -13,12 +13,22 @@ namespace LanguageCourse.Application.Services
     public class StudentService : IEntityService<StudentDtoRequest, Student>
     {
         private readonly IRepository<Student> _studentRepository;
-        private readonly IRepository<AcademicClass> _academicClassRepository;
+        private readonly IAcademicClassRepository _academicClassRepository;
+        private readonly AcademicClassService _academicClassService;
+        private readonly IEnrollmentRepository _enrollmentRepository;
+        private readonly EnrollmentService _enrollmentService;
 
-        public StudentService(IRepository<Student> studentRepository, IRepository<AcademicClass> academicClassRepository)
+        public StudentService(IRepository<Student> studentRepository, 
+                             IAcademicClassRepository academicClassRepository, 
+                             AcademicClassService academicClassService,
+                             IEnrollmentRepository enrollmentRepository,
+                             EnrollmentService enrollmentService)
         {
             _studentRepository = studentRepository;
             _academicClassRepository = academicClassRepository;
+            _academicClassService = academicClassService;
+            _enrollmentRepository = enrollmentRepository;
+            _enrollmentService = enrollmentService;
         }
 
         public void Create(StudentDtoRequest dto)
@@ -35,11 +45,8 @@ namespace LanguageCourse.Application.Services
                 throw new ArgumentException("At least one class must be specified to create the student.");
             }
 
-            //Checking if Academic Class exists
-            foreach (var classId in dto.AcademicClassIds)
-            {
-                _academicClassRepository.GetById(classId);
-            }
+            //Validate Academic Class for duplicates, if it exists and if it's full
+            _academicClassService.ValidateAcademicClass(dto.AcademicClassIds);
 
             //Attaching Student and Class to Enrollment
             foreach (var classId in dto.AcademicClassIds)
@@ -122,7 +129,24 @@ namespace LanguageCourse.Application.Services
             {
                 updatedStudent.Email = selectedStudent.Email;
             }
+            if(student.AcademicClassIds != null)
+            {
+                //Getting sure first to make Academic Classes validations and the student is not already enrolled in any Academic Class from the request
+                _academicClassService.ValidateAcademicClass(student.AcademicClassIds);
+                foreach (var classId in student.AcademicClassIds)
+                {
+                    _enrollmentService.IsStudentEnrolled(updatedStudent.Id, classId);                 
+                }
 
+                //Finally attaching the new Academic Classes to an already existent student            
+                foreach (var classId in student.AcademicClassIds)
+                {
+                    var enrollment = new Enrollment();
+                    enrollment.StudentId = updatedStudent.Id;
+                    enrollment.AcademicClassId = classId;
+                    _enrollmentRepository.Create(enrollment);
+                }
+            }
             _studentRepository.Update(id, updatedStudent);
         }
     }
