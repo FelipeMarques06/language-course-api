@@ -10,5 +10,6 @@ namespace LanguageCourse.Domain.Repositories
     public interface IEnrollmentRepository: IRepository<Enrollment>
     {
         public bool IsStudentEnrolled(int studentId, int academicClassId);
+        public bool ClassHasEnrolledStudents(int classId);
     }
 }

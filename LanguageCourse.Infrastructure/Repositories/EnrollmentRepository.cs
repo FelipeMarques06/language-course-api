@@ -66,5 +66,10 @@ namespace LanguageCourse.Infrastructure.Repositories
             return _dbContext.Enrollment
                 .Any(e => e.StudentId == studentId && e.AcademicClassId == academicClassId);
         }
+
+        public bool ClassHasEnrolledStudents(int classId)
+        {
+            return _dbContext.Enrollment.Any(e => e.AcademicClassId == classId);
+        }
     }
 }

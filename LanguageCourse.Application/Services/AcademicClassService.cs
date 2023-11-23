@@ -13,9 +13,11 @@ namespace LanguageCourse.Application.Services
     public class AcademicClassService : IEntityService<AcademicClassDtoRequest, AcademicClass>
     {
         private readonly IAcademicClassRepository _repository;
-        public AcademicClassService(IAcademicClassRepository repository)
+        private readonly EnrollmentService _enrollmentService;
+        public AcademicClassService(IAcademicClassRepository repository, EnrollmentService enrollmentService)
         {
             _repository = repository;
+            _enrollmentService = enrollmentService;
         }
         public void Create(AcademicClassDtoRequest dto)
         {
@@ -29,6 +31,8 @@ namespace LanguageCourse.Application.Services
 
         public void Delete(int id)
         {
+            //Checking if class has any student enrolled before deleting and finally deleting
+            _enrollmentService.ClassHasEnrolledStudents(id);
             _repository.Delete(id);
         }
 

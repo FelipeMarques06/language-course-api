@@ -13,21 +13,15 @@ namespace LanguageCourse.Application.Services
     public class StudentService : IEntityService<StudentDtoRequest, Student>
     {
         private readonly IRepository<Student> _studentRepository;
-        private readonly IAcademicClassRepository _academicClassRepository;
         private readonly AcademicClassService _academicClassService;
-        private readonly IEnrollmentRepository _enrollmentRepository;
         private readonly EnrollmentService _enrollmentService;
 
-        public StudentService(IRepository<Student> studentRepository, 
-                             IAcademicClassRepository academicClassRepository, 
+        public StudentService(IRepository<Student> studentRepository,
                              AcademicClassService academicClassService,
-                             IEnrollmentRepository enrollmentRepository,
                              EnrollmentService enrollmentService)
         {
             _studentRepository = studentRepository;
-            _academicClassRepository = academicClassRepository;
             _academicClassService = academicClassService;
-            _enrollmentRepository = enrollmentRepository;
             _enrollmentService = enrollmentService;
         }
 
@@ -141,10 +135,10 @@ namespace LanguageCourse.Application.Services
                 //Finally attaching the new Academic Classes to an already existent student            
                 foreach (var classId in student.AcademicClassIds)
                 {
-                    var enrollment = new Enrollment();
+                    var enrollment = new EnrollmentDtoRequest();
                     enrollment.StudentId = updatedStudent.Id;
                     enrollment.AcademicClassId = classId;
-                    _enrollmentRepository.Create(enrollment);
+                    _enrollmentService.Create(enrollment);
                 }
             }
             _studentRepository.Update(id, updatedStudent);

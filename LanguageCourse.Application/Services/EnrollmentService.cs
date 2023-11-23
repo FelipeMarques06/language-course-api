@@ -72,5 +72,12 @@ namespace LanguageCourse.Application.Services
                 throw new Exception($"Student with ID {studentId} is already enrolled in Class {academicClassId}");
             }       
         }
+        public void ClassHasEnrolledStudents(int classId)
+        {
+            if (_repository.ClassHasEnrolledStudents(classId))
+            {
+                throw new Exception($"Academic Class {classId} has enrolled students.");
+            }       
+        }
     }
 }
