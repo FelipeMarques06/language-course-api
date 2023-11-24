@@ -7,16 +7,18 @@ using LanguageCourse.Application.Dtos;
 using LanguageCourse.Domain.Entities;
 using LanguageCourse.Domain.Repositories;
 using LanguageCourse.Domain.Services;
+using DocumentValidator;
+using System.Text.RegularExpressions;
 
 namespace LanguageCourse.Application.Services
 {
     public class StudentService : IEntityService<StudentDtoRequest, Student>
     {
-        private readonly IRepository<Student> _studentRepository;
+        private readonly IStudentRepository _studentRepository;
         private readonly AcademicClassService _academicClassService;
         private readonly EnrollmentService _enrollmentService;
 
-        public StudentService(IRepository<Student> studentRepository,
+        public StudentService(IStudentRepository studentRepository,
                              AcademicClassService academicClassService,
                              EnrollmentService enrollmentService)
         {
@@ -30,13 +32,32 @@ namespace LanguageCourse.Application.Services
             var student = new Student
             {
                 Name = dto.Name,
-                Cpf = dto.Cpf,
+                Cpf = new string(dto.Cpf.Where(char.IsDigit).ToArray()), //Removing characters that are not numeric
                 Email = dto.Email,
                 Enrollments = new List<Enrollment>()
             };
             if (dto.AcademicClassIds == null || !dto.AcademicClassIds.Any())
             {
                 throw new ArgumentException("At least one class must be specified to create the student.");
+            }
+
+            //Validating CPF format
+            if (!CpfValidation.Validate(student.Cpf))
+            {
+                throw new ArgumentException("CPF is invalid, please check the document information again.");
+            }
+
+            //Checking if CPF was already registered
+            if (_studentRepository.CpfAlreadyExists(student.Cpf))
+            {
+                throw new ArgumentException("This CPF is already registered. CPFs must be unique");
+            }
+
+            //Checking if email is in a valid format
+            string pattern = @"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$";
+            if (!Regex.IsMatch(student.Email, pattern))
+            {
+                throw new ArgumentException("Email format is not valid.");
             }
 
             //Validate Academic Class for duplicates, if it exists and if it's full
@@ -57,7 +78,7 @@ namespace LanguageCourse.Application.Services
 
         public void Delete(int id)
         {
-            var student = _studentRepository.GetById(id);
+            _studentRepository.GetById(id);
             _studentRepository.Delete(id);
         }
 

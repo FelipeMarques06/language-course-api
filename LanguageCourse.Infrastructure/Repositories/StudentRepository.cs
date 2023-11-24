@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LanguageCourse.Infrastructure.Repositories
 {
-    public class StudentRepository : IRepository<Student>
+    public class StudentRepository : IStudentRepository
     {
         private readonly AppDbContext _dbContext;
         public StudentRepository(AppDbContext dbContext)
@@ -60,6 +60,10 @@ namespace LanguageCourse.Infrastructure.Repositories
             _dbContext.Entry(selectedStudent).State = EntityState.Detached;
             _dbContext.Entry(student).State = EntityState.Modified;
             _dbContext.SaveChanges();
+        }
+        public bool CpfAlreadyExists(string cpf)
+        {
+            return _dbContext.Student.Any(s => s.Cpf == cpf);
         }
     }
 }
