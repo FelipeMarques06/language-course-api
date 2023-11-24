@@ -11,6 +11,7 @@ O que é: Uma API que guarda as informações de Aluno, Turma e Matrícula para 
 ### Como rodar:
 Usando o Visual Studio, basta abrir a LanguageCourse.sln e usar o ISS Express. A API irá abrir com o Swagger para que os endpoints sejam testados.
 A API foi feita usando a versão 6.0 do .NET.
+
 OBS: O sqlite está configurado para testar a API em modo de desenvolvimento.
 
 Para um melhor teste das ferramentas, o ideal é criar uma Turma primeiro (Academic Class) para em seguida criar um Aluno (Student). A tabela Matrícula (Enrollment) será preenchida automaticamente, mas é possível adicionar dados à ela manualmente também.
